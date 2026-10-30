@@ -11,7 +11,9 @@ export function createSessionToken() {
 }
 export function isValidToken(token?: string) {
   if (!token || !secret() || secret().length < 32) return false;
-  const [expires, sig] = token.split('.');
+  const parts = token.split('.');
+  if (parts.length !== 2) return false;
+  const [expires, sig] = parts;
   if (!expires || !sig || !/^\d+$/.test(expires) || Number(expires) < Date.now()) return false;
   const expected = signature(expires);
   try { return timingSafeEqual(Buffer.from(sig, 'hex'), Buffer.from(expected, 'hex')); } catch { return false; }
